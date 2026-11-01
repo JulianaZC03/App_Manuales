@@ -1,0 +1,9 @@
+# Los .bat deben guardarse con fin de linea de Windows (CRLF) o pueden fallar
+*.bat text eol=crlf
+*.py  text eol=lf
+
+# Archivos binarios: Git no debe tocarlos
+*.docx binary
+*.png  binary
+*.jpg  binary
+*.ico  binary

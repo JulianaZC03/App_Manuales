@@ -1,0 +1,25 @@
+# Entorno virtual y caches de Python
+.venv/
+__pycache__/
+*.pyc
+
+# Registro del servidor
+app.log
+
+# Manuales generados y pruebas (pueden contener datos y firmas de clientes)
+Manual_OyM_*.docx
+Manual_OyM_*.pdf
+prueba_*.docx
+prueba_*.pdf
+
+# Firmas sueltas
+firma*.png
+firma*.jpg
+firma*.jpeg
+
+# Editor y sistema
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+~$*.docx
