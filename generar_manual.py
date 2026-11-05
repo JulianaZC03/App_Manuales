@@ -5,6 +5,8 @@ import subprocess
 import sys
 import tempfile
 import threading
+from pathlib import Path
+PLANTILLA_MANUAL = Path(__file__).parent / "Plantillas_manuales" / "plantilla_manual.docx"
 from datetime import datetime
 
 from docx.shared import Mm
@@ -80,7 +82,7 @@ def _firma(doc, datos):
 
 def generar(tipo, nombre_proyecto, ubicacion, componentes, otros, nivel_tension,
             tension_nominal, condiciones, condiciones_otras, disenador, constructor,
-            salida, plantilla="plantilla_manual.docx"):
+            salida, plantilla="Plantillas_manuales/plantilla_manual.docx"):
     """disenador / constructor: None si no se conoce, o dict con firma (bytes), cedula y mp."""
     componentes, otros = list(componentes), [o for o in otros if o.strip()]
     condiciones_otras = [c for c in condiciones_otras if c.strip()]
@@ -91,7 +93,7 @@ def generar(tipo, nombre_proyecto, ubicacion, componentes, otros, nivel_tension,
     tiene_solar = SOLAR in componentes or SOLAR_BAT in componentes
     tiene_baterias = SOLAR_BAT in componentes
 
-    doc = DocxTemplate(plantilla)
+    doc = DocxTemplate(str(plantilla))
     ctx = {
         "tipo": tipo,
         "nombre_proyecto": nombre_proyecto,
