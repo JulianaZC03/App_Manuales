@@ -17,13 +17,19 @@ REQUIERE = {
     "disenador.firma",
 }
 FIRMAS_OBLIGATORIAS = {"disenador"}
+DESVIACION_BASE = "LOS 15 MM (ver memorias)"      # la que trae el documento original
 
 
 def formulario(p):
     """Campos propios de este documento. Devuelve (datos, errores)."""
     numero = st.text_input("Número de declaración de diseñador:", key=f"{p}_numero")
+    extra = st.text_area("Otras desviaciones del diseño (opcional, una por línea)", key=f"{p}_desv",
+                         placeholder="Ej.: LA ALTURA DE MONTAJE DE LOS TOMACORRIENTES (ver memorias)")
+    st.caption(f"Siempre se incluye «SE PRESENTA DESVIACIÓN REFERENTE A {DESVIACION_BASE}». "
+               "Lo que escribas aquí se agrega como líneas adicionales.")
     errores = [] if numero.strip() else ["Declaración diseñador: falta el número de declaración."]
-    return {"numero": numero.strip()}, errores
+    return {"numero": numero.strip(),
+            "desviaciones_extra": [l.strip() for l in extra.splitlines() if l.strip()]}, errores
 
 
 def archivo(comunes):
@@ -37,6 +43,7 @@ def generar(comunes, datos):
     doc = DocxTemplate(str(PLANTILLA))
     doc.render({
         "numero_declaracion": datos["numero"],
+        "desviaciones": [DESVIACION_BASE] + [m(x) for x in datos.get("desviaciones_extra", [])],
         "disenador_nombre": m(d["nombre"]),
         "disenador_cedula": d["cedula"],
         "disenador_ciudad_exp": m(d["ciudad_exp"]),

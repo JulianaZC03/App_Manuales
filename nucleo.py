@@ -135,3 +135,37 @@ def docx_a_pdf(docx_bytes):
         except Exception:
             pass                          # sin Word o falló: se intenta con LibreOffice
     return _pdf_con_libreoffice(docx_bytes)
+
+
+# ---------------------------------------------------------------- marca de agua en cuadro de texto
+_FUENTES_MEDIDA = ["arialbd.ttf", "Arial Bold.ttf", "LiberationSans-Bold.ttf", "DejaVuSans-Bold.ttf"]
+
+
+def tamano_marca_agua(texto, ancho_mm, alto_mm, base_pt=11.0, minimo_pt=5.0):
+    """Tamaño de letra (en medios puntos, como lo pide Word en w:sz) con el que `texto`
+    cabe en un cuadro de texto de ancho x alto (mm, ya sin márgenes internos).
+    Parte del tamaño original y lo reduce solo si el texto no cabe."""
+    from PIL import ImageFont
+    ancho_pt, alto_pt = ancho_mm / 25.4 * 72, alto_mm / 25.4 * 72
+    pt = base_pt
+    while pt > minimo_pt:
+        escala = 10                                        # se mide a 10 px por punto
+        fuente = None
+        for nombre in _FUENTES_MEDIDA:
+            try:
+                fuente = ImageFont.truetype(nombre, int(pt * escala))
+                break
+            except OSError:
+                continue
+        ancho = lambda s: ((fuente.getlength(s) / escala * 0.85) if fuente else len(s) * pt * 0.56) + 0.5 * len(s)   # Calibri es ~15 % más angosta que Arial
+        lineas, actual = 1, ""
+        for palabra in texto.split():
+            prueba = (actual + " " + palabra).strip()
+            if actual and ancho(prueba) > ancho_pt:
+                lineas, actual = lineas + 1, palabra
+            else:
+                actual = prueba
+        if lineas * pt * 1.32 <= alto_pt:
+            break
+        pt -= 0.5
+    return int(round(max(pt, minimo_pt) * 2))
